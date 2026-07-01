@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CHALERMCHAICHAN SYSTEM</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#ef4d4d">
+
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="dns-prefetch" href="https://script.google.com">
+
+  <style>
+    /* 3. เปลี่ยนพื้นหลังเป็นสีแดงธีมแอป เพื่อให้สายตาไม่รู้สึกว่า "ค้างที่หน้าขาว" */
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      background-color: #ef4d4d; 
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      opacity: 0; /* ซ่อนไว้จนกว่าจะโหลดเสร็จ */
+      transition: opacity 0.3s ease;
+    }
+
+    /* 4. Loading Screen แบบ Minimal ที่โหลดไวที่สุด */
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #ef4d4d; /* ใช้สีแดงเพื่อให้กลมกลืน */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99;
+      transition: opacity 0.4s ease;
+    }
+
+    .loader {
+      width: 45px; height: 45px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div id="loading-screen">
+    <div class="loader"></div>
+    <div style="color: white; margin-top: 15px; font-family: sans-serif; font-size: 14px; letter-spacing: 1px;">กำลังโหลดระบบ...</div>
+  </div>
+
+  <div class="app-container">
+    <iframe
+      id="appFrame"
+      src="https://script.google.com/macros/s/AKfycbwCnLVDYdQWwAS_3yms7ktGcV4-GQrCV7WJkyi2kCSFDAJrYjvv00j85jThoICwcr3h/exec"
+      allow="geolocation *; camera *; microphone *"
+      scrolling="yes"
+      onload="hideLoader()"> 
+    </iframe>
+  </div>
+
+  <script>
+    function hideLoader() {
+      const loader = document.getElementById('loading-screen');
+      const frame = document.getElementById('appFrame');
+      
+      // แสดง Iframe และซ่อน Loading แบบนุ่มนวล
+      frame.style.opacity = '1';
+      loader.style.opacity = '0';
+      
+      setTimeout(function() {
+        loader.style.display = 'none';
+      }, 400);
+    }
+
+    // ปรับความสูงอัตโนมัติ (คงเดิม)
+    window.addEventListener('message', function(e) {
+      if (e.data.frameHeight) {
+        var frame = document.getElementById('appFrame');
+        if (frame) {
+          frame.style.height = e.data.frameHeight + 'px';
+        }
+      }
+    }, false);
+
+    // ป้องกัน Pull-to-refresh
+    document.addEventListener('touchmove', function(e) {
+      if (e.scale !== 1) { e.preventDefault(); }
+    }, { passive: false });
+  </script>
+
+</body>
+</html>

@@ -3,28 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>CCC Waste</title>
+  <title>CCC Waste - Eco Dashboard</title>
   
   <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1GhR1quDqH5UIkMWIygRGM1zT34W3kGOW">
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <!-- ปรับสี Theme Bar บนมือถือให้เข้ากับธีมเขียว -->
-  <meta name="theme-color" content="#0b3b32">
+  <!-- Theme Bar บนมือถือใช้โทนเขียว Sage สบายตา -->
+  <meta name="theme-color" content="#8ba89f">
 
+  <!-- เร่งการดึงข้อมูลล่วงหน้า -->
   <link rel="preconnect" href="https://script.google.com" crossorigin>
   <link rel="dns-prefetch" href="https://script.google.com">
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0; 
       padding: 0;
       width: 100%; 
       height: 100%;
-      height: 100dvh; /* รองรับ Responsive Viewport บนมือถือ */
-      background-color: #0b3b32; /* เปลี่ยนเป็นสีเขียวธีมเดียวกับแอป */
+      height: 100dvh; /* ป้องกันแถบ Browser บังหน้าจอบนมือถือ */
+      background-color: #8ba89f; /* สีเขียว Sage Green สบายตาตามธีมหน้าเว็บ */
       overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
 
     .app-container {
@@ -40,44 +46,57 @@
       border: none;
       display: block;
       opacity: 0;
-      transition: opacity 0.3s ease;
-      -webkit-overflow-scrolling: touch; /* ให้ไถหน้าจอบน iOS ลื่นขึ้น */
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Loading Screen โทนเขียวเข้ม */
+    /* Loading Screen สไตล์ Eco Luxe */
     #loading-screen {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: #0b3b32;
+      background: radial-gradient(circle at center, #9bb8ae 0%, #7d9e94 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 99;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease, visibility 0.4s;
     }
 
-    .loader {
-      width: 45px; 
-      height: 45px;
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid #00e6a8; /* สีหมุนตัดโทนสว่าง */
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    /* Minimal Eco Leaf Loader */
+    .eco-loader {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50% 0 50% 50%; /* ทรงหยดน้ำ/ใบไม้ */
+      border-top-color: #0d3b32; /* เขียว Forest Green */
+      animation: ecoSpin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
     }
 
-    @keyframes spin { 
-      0% { transform: rotate(0deg); } 
-      100% { transform: rotate(360deg); } 
+    @keyframes ecoSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      color: #ffffff;
+      margin-top: 18px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
 
+  <!-- Loading Screen เรียบหรูสไตล์รักษ์โลก -->
   <div id="loading-screen">
-    <div class="loader"></div>
-    <div style="color: #ffffff; margin-top: 15px; font-family: sans-serif; font-size: 14px; letter-spacing: 1px;">กำลังโหลดระบบ...</div>
+    <div class="eco-loader"></div>
+    <div class="loading-text">กำลังโหลด...</div>
   </div>
 
   <div class="app-container">
@@ -99,11 +118,14 @@
       loader.style.opacity = '0';
       
       setTimeout(function() {
-        loader.style.display = 'none';
+        loader.style.visibility = 'hidden';
       }, 400);
     }
 
-    // รับค่าส่วนสูงกรณี Google Apps Script ส่งความสูงมา
+    // Safety Timeout: หากเน็ตช้าเกิน 4 วินาที ให้เข้าหน้าเว็บทันที
+    setTimeout(hideLoader, 4000);
+
+    // รองรับการส่งค่าความสูง frame จาก Google Apps Script
     window.addEventListener('message', function(e) {
       if (e.data && e.data.frameHeight) {
         var frame = document.getElementById('appFrame');
@@ -113,7 +135,7 @@
       }
     }, false);
 
-    // ป้องกันการขยายหน้าจอแบบ Pinch-zoom บนมือถือ
+    // ป้องกัน Pinch-zoom บนสมาร์ตโฟน
     document.addEventListener('touchmove', function(e) {
       if (e.scale && e.scale !== 1) { 
         e.preventDefault(); 
